@@ -1,0 +1,11 @@
+<Context>
+	<Resource name="jdbc/SocialReading"
+		auth="Container"
+		type="javax.sql.DataSource"
+		username="root"
+		password="restuser"
+		driverClassName="com.mysql.jdbc.Driver"
+		url="jdbc:mysql://localhost:3306/SocialReading?useSSL=false"
+		maxActive="6"
+		maxIdle="3"/>
+</Context>
