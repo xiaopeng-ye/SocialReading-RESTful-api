@@ -1,7 +1,6 @@
 package model;
 
 import java.util.ArrayList;
-
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -12,7 +11,7 @@ public class Users {
 	public Users() {
 		this.users = new ArrayList<>();
 	}
-	
+
 	@XmlElement(name = "user")
 	public ArrayList<Link> getUsers() {
 		return users;
@@ -21,6 +20,5 @@ public class Users {
 	public void setUsers(ArrayList<Link> users) {
 		this.users = users;
 	}
-	
-	
+
 }

@@ -70,8 +70,7 @@ public class UsersResource {
 			if (generatedID.next()) {
 				user.setId(generatedID.getInt(1));
 				String location = uriInfo.getAbsolutePath() + "/" + user.getId();
-				return Response.status(Response.Status.CREATED).entity(user).header("Location", location).build();
-				// .header("Content-Location", location).build();
+				return Response.status(Response.Status.CREATED).header("Location", location).build();
 			}
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("No se pudo crear el usuario").build();
 
@@ -106,7 +105,7 @@ public class UsersResource {
 	@PUT
 	@Consumes({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
 	@Path("{id_user}")
-	public Response updateGaraje(@PathParam("id_user") int id, User newUser) {
+	public Response updateUser(@PathParam("id_user") int id, User newUser) {
 		try {
 			User user;
 			PreparedStatement ps = conn.prepareStatement("SELECT * FROM user WHERE id = ?");
@@ -115,9 +114,8 @@ public class UsersResource {
 			if (rs.next()) {
 				user = new User(rs.getString("name"), rs.getString("gender"), rs.getInt("age"), rs.getString("email"));
 			} else {
-				return Response.status(Response.Status.NOT_FOUND).entity("Elemento no encontrado").build();
+				return Response.status(Response.Status.NOT_FOUND).entity("Usuario no encontrado").build();
 			}
-			user.setName(newUser.getName());
 			user.setGender(newUser.getGender());
 			user.setAge(newUser.getAge());
 			user.setEmail(newUser.getEmail());
@@ -131,8 +129,7 @@ public class UsersResource {
 			ps.setInt(5, id);
 			ps.executeUpdate();
 
-			return Response.status(Response.Status.OK).entity(user)
-					.header("Content-Location", uriInfo.getAbsolutePath()).build();
+			return Response.status(Response.Status.OK).header("Content-Location", uriInfo.getAbsolutePath()).build();
 		} catch (SQLException e) {
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
 					.entity("No se pudo actualizar el usuario\n" + e.getStackTrace()).build();
@@ -141,7 +138,7 @@ public class UsersResource {
 
 	@DELETE
 	@Path("{id_user}")
-	public Response deleteGaraje(@PathParam("id_user") int id) {
+	public Response deleteUser(@PathParam("id_user") int id) {
 		try {
 			PreparedStatement ps = conn.prepareStatement("DELETE FROM user WHERE id = ?;");
 			ps.setInt(1, id);
@@ -149,7 +146,7 @@ public class UsersResource {
 			if (affectedRows == 1)
 				return Response.status(Response.Status.NO_CONTENT).build();
 			else
-				return Response.status(Response.Status.NOT_FOUND).entity("Elemento no encontrado").build();
+				return Response.status(Response.Status.NOT_FOUND).entity("Usuario no encontrado").build();
 		} catch (SQLException e) {
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
 					.entity("No se pudo eliminar el usuario\n" + e.getStackTrace()).build();
@@ -158,14 +155,14 @@ public class UsersResource {
 
 	@GET
 	@Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
-	public Response getGarajes2(@QueryParam("name") @DefaultValue("") String name) {
+	public Response getUsers(@QueryParam("name") @DefaultValue("") String name) {
 		try {
 			PreparedStatement ps = conn.prepareStatement("SELECT id FROM user WHERE name LIKE '%" + name + "%'");
 			ResultSet rs = ps.executeQuery();
 			Users users = new Users();
 			ArrayList<Link> listUsers = users.getUsers();
 			while (rs.next()) {
-				listUsers.add(new Link(uriInfo.getAbsolutePath() + "/" + rs.getInt("id"), "self"));
+				listUsers.add(new Link(rs.getInt("id"), uriInfo.getAbsolutePath() + "/" + rs.getInt("id"), "self"));
 			}
 			return Response.status(Response.Status.OK).entity(users).build();
 		} catch (SQLException e) {
