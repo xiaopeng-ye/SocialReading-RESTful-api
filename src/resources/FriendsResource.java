@@ -43,7 +43,7 @@ public class FriendsResource {
 	private Connection conn;
 
 	private int userId;
-	private final SimpleDateFormat format = new SimpleDateFormat("MM/dd/yyyy");
+	private final SimpleDateFormat format = new SimpleDateFormat("MM-dd-yyyy");
 
 	public FriendsResource(@PathParam("id_user") int userId) {
 		this.userId = userId;
