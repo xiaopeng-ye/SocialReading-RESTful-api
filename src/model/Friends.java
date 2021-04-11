@@ -8,22 +8,22 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
-@XmlRootElement(name = "readings")
-public class Readings {
+@XmlRootElement(name = "friends")
+public class Friends {
 	private URL next;
-	private ArrayList<Link> readings;
+	private ArrayList<Link> friends;
 
-	public Readings() {
+	public Friends() {
 
 	}
 
-	public Readings(String next) {
+	public Friends(String next) {
 		try {
 			this.next = new URL(next);
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
 		}
-		readings = new ArrayList<>();
+		this.friends = new ArrayList<>();
 	}
 
 	@XmlAttribute
@@ -35,12 +35,13 @@ public class Readings {
 		this.next = next;
 	}
 
-	@XmlElement(name = "reading")
-	public ArrayList<Link> getReadings() {
-		return readings;
+	@XmlElement(name = "user")
+	public ArrayList<Link> getUsers() {
+		return friends;
 	}
 
-	public void setBooks(ArrayList<Link> books) {
-		this.readings = books;
+	public void setUsers(ArrayList<Link> users) {
+		this.friends = users;
 	}
+
 }

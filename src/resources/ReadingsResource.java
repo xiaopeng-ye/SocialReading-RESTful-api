@@ -197,7 +197,7 @@ public class ReadingsResource {
 			int nextOffset = limit + offset;
 			Readings readings = new Readings(uriInfo.getAbsolutePath() + "?date=" + format.format(castDate) + "&limit="
 					+ limit + "&offset=" + nextOffset);
-			ArrayList<Link> listBooks = readings.getBooks();
+			ArrayList<Link> listBooks = readings.getReadings();
 			while (rs.next()) {
 				listBooks.add(
 						new Link(rs.getInt("id_book"), uriInfo.getAbsolutePath() + "/" + rs.getInt("id_book"), "self"));
