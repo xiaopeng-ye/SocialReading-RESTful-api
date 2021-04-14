@@ -97,3 +97,62 @@ DEFAULT CHARACTER SET = utf8;
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
+
+-- Users
+INSERT INTO SocialReading.user VALUES (1, 'Eren', 'm', 19, 'eren@correo.aot');
+INSERT INTO SocialReading.user VALUES (2, 'Mikasa', 'f', 19, 'mikasa@correo.aot');
+INSERT INTO SocialReading.user VALUES (3, 'Armin', 'm', 19, 'armin@correo.aot');
+INSERT INTO SocialReading.user VALUES (4, 'Levi', 'm', 29, 'levi@correo.aot');
+INSERT INTO SocialReading.user VALUES (5, 'Zeke', 'm', 29, 'zeke@correo.aot');
+INSERT INTO SocialReading.user VALUES (6, 'Reiner', 'm', 21, 'reiner@correo.aot');
+INSERT INTO SocialReading.user VALUES (7, 'Annie', 'f', 20, 'annie@correo.aot');
+INSERT INTO SocialReading.user VALUES (8, 'Pieck', 'f', 20, 'pieck@correo.aot');
+INSERT INTO SocialReading.user VALUES (9, 'Falco', 'm', 13, 'falco@correo.aot');
+INSERT INTO SocialReading.user VALUES (10, 'Historia', 'f', 19, 'historia@correo.aot');
+
+-- Books
+INSERT INTO SocialReading.book VALUES(1, 'Acorazado', 'R. Braun', 'Autoayuda', '1231312');
+INSERT INTO SocialReading.book VALUES(2, 'Bestia', 'Z. Jaeger', 'Cientificos', '32343242');
+INSERT INTO SocialReading.book VALUES(3, 'Carguero', 'P. Finger', 'Aventuras', '342342358');
+INSERT INTO SocialReading.book VALUES(4, 'Colosal', 'A. Arlert', 'Aventuras', '342342355');
+INSERT INTO SocialReading.book VALUES(5, 'Ataque', 'E. Jaeger', 'Accion', '34324232');
+INSERT INTO SocialReading.book VALUES(6, 'Fundador', 'E. Jaeger', 'Historia', '34324239');
+INSERT INTO SocialReading.book VALUES(7, 'Hembra', 'A. Leonhardt', 'Deporte', '0000000007');
+INSERT INTO SocialReading.book VALUES(8, 'Mandibula', 'F. Grice', 'Humor', '0000000008');
+INSERT INTO SocialReading.book VALUES(9, 'Martillo', 'E. Jaeger', 'Accion', '0000000009');
+
+
+-- Friends
+INSERT INTO SocialReading.is_friend_of VALUES(1, 2);
+INSERT INTO SocialReading.is_friend_of VALUES(1, 3);
+INSERT INTO SocialReading.is_friend_of VALUES(1, 10);
+INSERT INTO SocialReading.is_friend_of VALUES(2, 3);
+INSERT INTO SocialReading.is_friend_of VALUES(2, 4);
+INSERT INTO SocialReading.is_friend_of VALUES(2, 10);
+INSERT INTO SocialReading.is_friend_of VALUES(3, 4);
+INSERT INTO SocialReading.is_friend_of VALUES(3, 10);
+INSERT INTO SocialReading.is_friend_of VALUES(4, 10);
+INSERT INTO SocialReading.is_friend_of VALUES(6, 7);
+INSERT INTO SocialReading.is_friend_of VALUES(6, 8);
+INSERT INTO SocialReading.is_friend_of VALUES(6, 9);
+INSERT INTO SocialReading.is_friend_of VALUES(8, 9);
+
+
+-- Readings
+INSERT INTO SocialReading.reading VALUES (1, 1, '2021/03/01', 1);
+INSERT INTO SocialReading.reading VALUES (1, 5, '2021/01/07', 5);
+INSERT INTO SocialReading.reading VALUES (1, 6, '2021/02/20', 4);
+INSERT INTO SocialReading.reading VALUES (1, 9, '2021/04/01', 4);
+INSERT INTO SocialReading.reading VALUES (2, 5, '2021/02/12', 5);
+INSERT INTO SocialReading.reading VALUES (3, 4, '2021/02/22', 4);
+INSERT INTO SocialReading.reading VALUES (3, 7, '2021/04/01', 3);
+INSERT INTO SocialReading.reading VALUES (4, 1, '2021/02/03', 2);
+INSERT INTO SocialReading.reading VALUES (4, 2, '2021/02/03', 1);
+INSERT INTO SocialReading.reading VALUES (5, 2, '2021/02/03', 5);
+INSERT INTO SocialReading.reading VALUES (6, 1, '2021/03/01', 5);
+INSERT INTO SocialReading.reading VALUES (6, 5, '2021/03/01', 1);
+INSERT INTO SocialReading.reading VALUES (7, 7, '2021/02/01', 5);
+INSERT INTO SocialReading.reading VALUES (8, 3, '2021/03/03', 5);
+INSERT INTO SocialReading.reading VALUES (8, 2, '2021/04/01', 2);
+INSERT INTO SocialReading.reading VALUES (9, 8, '2021/04/02', 5);
+INSERT INTO SocialReading.reading VALUES (10, 5, '2021/03/21', 4);
