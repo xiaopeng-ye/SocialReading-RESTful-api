@@ -1,0 +1,466 @@
+{
+	"info": {
+		"_postman_id": "1ccb6bc3-6d90-467e-8ab6-29ad4cd327a4",
+		"name": "Restful project",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Añadir usuario a la red de lectura.",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/xml"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n<user>\n    <age>32</age>\n    <email>correo</email>\n    <gender>f</gender>\n    <name>prueba4</name>\n</user>"
+				},
+				"url": {
+					"raw": "http://localhost:8080/SocialReading/api/users",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"SocialReading",
+						"api",
+						"users"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Ver los datos básicos de un usuario",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"body": {},
+				"url": {
+					"raw": "http://localhost:8080/SocialReading/api/users/3",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"SocialReading",
+						"api",
+						"users",
+						"3"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Cambiar datos básicos del usuario.",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/xml"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n<user>\n    <age>32</age>\n    <email>correo</email>\n    <gender>f</gender>\n    <name>holamundo</name>\n</user>"
+				},
+				"url": {
+					"raw": "http://localhost:8080/SocialReading/api/users/5",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"SocialReading",
+						"api",
+						"users",
+						"5"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Borrar nuestro perfil de la red.",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "http://localhost:8080/SocialReading/api/users/3",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"SocialReading",
+						"api",
+						"users",
+						"3"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Obtener un listado de todos los usuarios.",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"body": {},
+				"url": {
+					"raw": "http://localhost:8080/SocialReading/api/users?name=pr",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"SocialReading",
+						"api",
+						"users"
+					],
+					"query": [
+						{
+							"key": "name",
+							"value": "pr"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Consultar los últimos libros leídos por un usuario.",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "",
+						"value": ""
+					}
+				],
+				"body": {},
+				"url": {
+					"raw": "http://localhost:8080/SocialReading/api/users/1/readings?date=04-11-2021&limit=2&offset=0",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"SocialReading",
+						"api",
+						"users",
+						"1",
+						"readings"
+					],
+					"query": [
+						{
+							"key": "date",
+							"value": "04-11-2021"
+						},
+						{
+							"key": "limit",
+							"value": "2"
+						},
+						{
+							"key": "offset",
+							"value": "0"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Añadir la lectura de un libro por un usuario con una calificación",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/xml"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "<reading>\n\t<book>\n\t\t<title>hola</title>\n\t\t<author>hola</author>\n\t\t<category>hola</category>\n\t\t<isbn>12345435</isbn>\n\t</book>\n\t<qualification>2</qualification>\n\t<date>11-04-2021</date>\n</reading>"
+				},
+				"url": {
+					"raw": "http://localhost:8080/SocialReading/api/users/1/readings",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"SocialReading",
+						"api",
+						"users",
+						"1",
+						"readings"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Eliminar la lectura de un libro por un usuario.",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "http://localhost:8080/SocialReading/api/users/1/readings/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"SocialReading",
+						"api",
+						"users",
+						"1",
+						"readings",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Editar un libro de la red",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/xml"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "<reading>\n\t<book>\n\t\t<title>hola</title>\n\t\t<author>hola</author>\n\t\t<category>hola</category>\n\t\t<isbn>342342355</isbn>\n\t</book>\n\t<qualification>7</qualification>\n\t<date>11-04-1021</date>\n</reading>"
+				},
+				"url": {
+					"raw": "http://localhost:8080/SocialReading/api/users/2/readings/3",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"SocialReading",
+						"api",
+						"users",
+						"2",
+						"readings",
+						"3"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Los usuarios además podrán añadir amigos dentro de la red de lectura",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"age\": 19,\n    \"email\": \"mikasa@correo.aot\",\n    \"gender\": \"f\",\n    \"name\": \"Eren\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8080/SocialReading/api/users/3/friends",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"SocialReading",
+						"api",
+						"users",
+						"3",
+						"friends"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Eliminar un amigo",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "http://localhost:8080/SocialReading/api/users/3/friends/2",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"SocialReading",
+						"api",
+						"users",
+						"3",
+						"friends",
+						"2"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Obtener una lista de todos nuestros amigos. ",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "http://localhost:8080/SocialReading/api/users/2/friends?name=i&limit=1&offset=1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"SocialReading",
+						"api",
+						"users",
+						"2",
+						"friends"
+					],
+					"query": [
+						{
+							"key": "name",
+							"value": "i"
+						},
+						{
+							"key": "limit",
+							"value": "1"
+						},
+						{
+							"key": "offset",
+							"value": "1"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Consultar los últimos libros leídos por nuestros amigos",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "http://localhost:8080/SocialReading/api/users/2/friends/readings",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"SocialReading",
+						"api",
+						"users",
+						"2",
+						"friends",
+						"readings"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Buscar en libros recomendados por nuestros amigos.",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "http://localhost:8080/SocialReading/api/users/1/friends/recommended_books?qualification=4",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"SocialReading",
+						"api",
+						"users",
+						"1",
+						"friends",
+						"recommended_books"
+					],
+					"query": [
+						{
+							"key": "qualification",
+							"value": "4"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Consultar fácilmente la descripción necesaria para una aplicación móvil que queremos realizar, que muestre los datos básicos de un usuario, su último libro leído y su información, el número de amigos y el último leído por sus amigos",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "http://localhost:8080/SocialReading/api/users/3/app",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"SocialReading",
+						"api",
+						"users",
+						"3",
+						"app"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
