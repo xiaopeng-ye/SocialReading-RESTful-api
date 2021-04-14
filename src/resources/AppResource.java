@@ -111,14 +111,14 @@ public class AppResource {
 				ps.setInt(1, rs.getInt("id_user"));
 				ResultSet rs1 = ps.executeQuery();
 				if (rs1.next()) {
-					listReadings.add(new Link(rs1.getInt("id_book"), uriInfo.getBaseUri() + "users/"
+					listReadings.add(new Link(rs.getInt("id_user"), uriInfo.getBaseUri() + "users/"
 							+ rs.getInt("id_user") + "/readings/" + rs1.getInt("id_book"), "self"));
 				}
 
 			}
 			return Response.status(Response.Status.OK).entity(app).build();
 		} catch (SQLException e) {
-			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Error de acceso a BBDD").build();
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Error de acceso a BBDD" + e.getMessage()).build();
 		}
 	}
 

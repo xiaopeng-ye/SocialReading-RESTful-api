@@ -14,7 +14,7 @@ public class Readings {
 	private ArrayList<Link> readings;
 
 	public Readings() {
-
+		readings = new ArrayList<>();
 	}
 
 	public Readings(String next) {

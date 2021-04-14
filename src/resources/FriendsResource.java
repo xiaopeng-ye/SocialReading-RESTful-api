@@ -29,7 +29,6 @@ import javax.ws.rs.core.UriInfo;
 import org.apache.naming.NamingContext;
 
 import model.Readings;
-import model.Books;
 import model.Friends;
 import model.Link;
 import model.User;
@@ -180,19 +179,21 @@ public class FriendsResource {
 	public Response getRecommendedBook(@QueryParam("qualification") @DefaultValue("0") int qualification,
 			@QueryParam("category") @DefaultValue("") String category) {
 		try {
-
 			PreparedStatement ps = conn.prepareStatement(
-					"SELECT l.id FROM book l, reading le WHERE l.id=le.id_book AND l.category LIKE '%" + category
-							+ "%' AND le.id_user IN ( SELECT id_user_b FROM is_friend_of WHERE id_user_a = ? ) GROUP BY l.id HAVING AVG(le.qualification) > ?");
-			ps.setInt(1, this.userId);
-			ps.setInt(2, qualification);
+					"SELECT l.id, le.id_user FROM book l, reading le WHERE l.id=le.id_book AND le.qualification > ? AND l.category LIKE '%"
+							+ category
+							+ "%' AND le.id_user IN ( SELECT id_user_b FROM is_friend_of WHERE id_user_a = ?)");
+			ps.setInt(1, qualification);
+			ps.setInt(2, this.userId);
 			ResultSet rs = ps.executeQuery();
-			Books books = new Books();
-			ArrayList<Link> listBooks = books.getBooks();
+			Readings readings = new Readings();
+			ArrayList<Link> listReadings = readings.getReadings();
 			while (rs.next()) {
-				listBooks.add(new Link(rs.getInt("id"), uriInfo.getBaseUri() + "books/" + rs.getInt("id"), "self"));
+				listReadings.add(new Link(rs.getInt("id_user"),
+						uriInfo.getBaseUri() + "users/" + rs.getInt("id_user") + "/readings/" + rs.getInt("id"),
+						"self"));
 			}
-			return Response.status(Response.Status.OK).entity(books).build();
+			return Response.status(Response.Status.OK).entity(readings).build();
 		} catch (SQLException e) {
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Error de acceso a BBDD").build();
 		}
