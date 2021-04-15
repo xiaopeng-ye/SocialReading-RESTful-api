@@ -64,7 +64,7 @@ public class FriendsResource {
 	@Consumes({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
 	public Response addFriend(User user) {
 		try {
-			PreparedStatement ps = conn.prepareStatement("SELECT * FROM user WHERE id = ? OR name = ?");
+			PreparedStatement ps = conn.prepareStatement("SELECT * FROM user WHERE id = ?");
 			ps.setInt(1, user.getId());
 			ps.setString(2, user.getName());
 			ResultSet rs = ps.executeQuery();
@@ -83,7 +83,7 @@ public class FriendsResource {
 			}
 		} catch (SQLException e) {
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-					.entity("No se pudo crear el usuario\n" + e.getStackTrace()).build();
+					.entity("No se pudo añadir como amigo\n" + e.getStackTrace()).build();
 		}
 	}
 
