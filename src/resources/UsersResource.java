@@ -164,7 +164,7 @@ public class UsersResource {
 			while (rs.next()) {
 				listUsers.add(new Link(rs.getInt("id"), uriInfo.getAbsolutePath() + "/" + rs.getInt("id"), "self"));
 			}
-			return Response.status(Response.Status.OK).entity(users).build();
+			return Response.status(Response.Status.OK).entity(users).header("Content-Location", uriInfo.getAbsolutePath()).build();
 		} catch (SQLException e) {
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Error de acceso a BBDD").build();
 		}

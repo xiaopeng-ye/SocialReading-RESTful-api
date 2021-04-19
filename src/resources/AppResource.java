@@ -116,7 +116,7 @@ public class AppResource {
 				}
 
 			}
-			return Response.status(Response.Status.OK).entity(app).build();
+			return Response.status(Response.Status.OK).entity(app).header("Content-Location", uriInfo.getAbsolutePath()).build();
 		} catch (SQLException e) {
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Error de acceso a BBDD" + e.getMessage()).build();
 		}

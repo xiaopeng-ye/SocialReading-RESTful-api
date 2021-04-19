@@ -202,7 +202,7 @@ public class ReadingsResource {
 				listBooks.add(
 						new Link(rs.getInt("id_book"), uriInfo.getAbsolutePath() + "/" + rs.getInt("id_book"), "self"));
 			}
-			return Response.status(Response.Status.OK).entity(readings).build();
+			return Response.status(Response.Status.OK).entity(readings).header("Content-Location", uriInfo.getAbsolutePath()).build();
 		} catch (ParseException e) {
 			return Response.status(Response.Status.BAD_REQUEST).entity("Fecha con formato incorrecto").build();
 		} catch (SQLException e) {

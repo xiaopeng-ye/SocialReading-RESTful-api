@@ -125,7 +125,7 @@ public class FriendsResource {
 			while (rs.next()) {
 				listFriends.add(new Link(rs.getInt(1), uriInfo.getBaseUri() + "users" + "/" + rs.getInt(1), "self"));
 			}
-			return Response.status(Response.Status.OK).entity(friends).build();
+			return Response.status(Response.Status.OK).entity(friends).header("Content-Location", uriInfo.getAbsolutePath()).build();
 		} catch (SQLException e) {
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Error de acceso a BBDD").build();
 		}
@@ -165,7 +165,7 @@ public class FriendsResource {
 				}
 
 			}
-			return Response.status(Response.Status.OK).entity(readings).build();
+			return Response.status(Response.Status.OK).entity(readings).header("Content-Location", uriInfo.getAbsolutePath()).build();
 		} catch (ParseException e) {
 			return Response.status(Response.Status.BAD_REQUEST).entity("Fecha con formato incorrecto").build();
 		} catch (SQLException e) {
@@ -193,7 +193,7 @@ public class FriendsResource {
 						uriInfo.getBaseUri() + "users/" + rs.getInt("id_user") + "/readings/" + rs.getInt("id"),
 						"self"));
 			}
-			return Response.status(Response.Status.OK).entity(readings).build();
+			return Response.status(Response.Status.OK).entity(readings).header("Content-Location", uriInfo.getAbsolutePath()).build();
 		} catch (SQLException e) {
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Error de acceso a BBDD").build();
 		}
