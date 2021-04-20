@@ -7,32 +7,42 @@ import java.util.ArrayList;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlType;
 
 @XmlRootElement(name = "readings")
 public class Readings {
 	private URL next;
+	private URL prev;
 	private ArrayList<Link> readings;
 
 	public Readings() {
 		readings = new ArrayList<>();
 	}
 
-	public Readings(String next) {
+	@XmlAttribute(required = false)
+	public URL getPrev() {
+		return prev;
+	}
+
+	public void setPrev(String prev) {
+		try {
+			this.prev = new URL(prev);
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+		}
+	}
+
+	@XmlAttribute(required = false)
+	public URL getNext() {
+		return next;
+	}
+
+	public void setNext(String next) {
 		try {
 			this.next = new URL(next);
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
 		}
-		readings = new ArrayList<>();
-	}
-
-	@XmlAttribute
-	public URL getNext() {
-		return next;
-	}
-
-	public void setNext(URL next) {
-		this.next = next;
 	}
 
 	@XmlElement(name = "reading")

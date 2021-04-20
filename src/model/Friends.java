@@ -11,28 +11,37 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name = "friends")
 public class Friends {
 	private URL next;
+	private URL prev;
 	private ArrayList<Link> friends;
 
 	public Friends() {
-
+		this.friends = new ArrayList<>();
 	}
 
-	public Friends(String next) {
+	@XmlAttribute(required = false)
+	public URL getPrev() {
+		return prev;
+	}
+
+	public void setPrev(String prev) {
+		try {
+			this.prev = new URL(prev);
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+		}
+	}
+
+	@XmlAttribute(required = false)
+	public URL getNext() {
+		return next;
+	}
+
+	public void setNext(String next) {
 		try {
 			this.next = new URL(next);
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
 		}
-		this.friends = new ArrayList<>();
-	}
-
-	@XmlAttribute
-	public URL getNext() {
-		return next;
-	}
-
-	public void setNext(URL next) {
-		this.next = next;
 	}
 
 	@XmlElement(name = "user")

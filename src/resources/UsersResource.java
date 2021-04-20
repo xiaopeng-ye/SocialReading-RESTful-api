@@ -27,6 +27,9 @@ import javax.ws.rs.core.UriInfo;
 
 import org.apache.naming.NamingContext;
 
+import dao.FriendDAO;
+import dao.ReadingDAO;
+import dao.UserDAO;
 import model.Link;
 import model.User;
 import model.Users;
@@ -38,6 +41,7 @@ public class UsersResource {
 
 	private DataSource ds;
 	private Connection conn;
+	private final UserDAO userDAO;
 
 	public UsersResource() {
 		InitialContext ctx;
@@ -52,28 +56,20 @@ public class UsersResource {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+		userDAO = UserDAO.getInstance();
 	}
 
 	@POST
 	@Consumes({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
 	public Response createUser(User user) {
 		try {
-			PreparedStatement ps = conn.prepareStatement(
-					"INSERT INTO `SocialReading`.`user`(`name`,`gender`,`age`,`email`) VALUES (?, ?, ?, ?)",
-					Statement.RETURN_GENERATED_KEYS);
-			ps.setString(1, user.getName());
-			ps.setString(2, user.getGender());
-			ps.setInt(3, user.getAge());
-			ps.setString(4, user.getEmail());
-			ps.executeUpdate();
-			ResultSet generatedID = ps.getGeneratedKeys();
-			if (generatedID.next()) {
-				user.setId(generatedID.getInt(1));
-				String location = uriInfo.getAbsolutePath() + "/" + user.getId();
-				return Response.status(Response.Status.CREATED).header("Location", location).build();
+			User createdUser = userDAO.addUser(conn, user);
+			if (createdUser == null) {
+				return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("No se pudo crear el usuario")
+						.build();
 			}
-			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("No se pudo crear el usuario").build();
-
+			return Response.status(Response.Status.CREATED)
+					.header("Location", uriInfo.getAbsolutePath() + "/" + user.getId()).build();
 		} catch (SQLException e) {
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
 					.entity("No se pudo crear el usuario\n" + e.getStackTrace()).build();
@@ -85,18 +81,12 @@ public class UsersResource {
 	@Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
 	public Response getUser(@PathParam("id_user") int id) {
 		try {
-			PreparedStatement ps = conn.prepareStatement("SELECT * FROM user WHERE id = ?");
-			ps.setInt(1, id);
-			ResultSet rs = ps.executeQuery();
-			if (rs.next()) {
-				User user = new User(rs.getString("name"), rs.getString("gender"), rs.getInt("age"),
-						rs.getString("email"));
-				user.setId(id);
-				return Response.status(Response.Status.OK).entity(user)
-						.header("Content-Location", uriInfo.getAbsolutePath()).build();
-			} else {
+			User user = userDAO.getUser(conn, id);
+			if (user == null) {
 				return Response.status(Response.Status.NOT_FOUND).entity("Usuario no encontrado").build();
 			}
+			return Response.status(Response.Status.OK).entity(user)
+					.header("Content-Location", uriInfo.getAbsolutePath()).build();
 		} catch (SQLException e) {
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Error de acceso a BBDD").build();
 		}
@@ -107,27 +97,17 @@ public class UsersResource {
 	@Path("{id_user}")
 	public Response updateUser(@PathParam("id_user") int id, User newUser) {
 		try {
-			User user;
-			PreparedStatement ps = conn.prepareStatement("SELECT * FROM user WHERE id = ?");
-			ps.setInt(1, id);
-			ResultSet rs = ps.executeQuery();
-			if (rs.next()) {
-				user = new User(rs.getString("name"), rs.getString("gender"), rs.getInt("age"), rs.getString("email"));
-			} else {
+			User user = userDAO.getUser(conn, id);
+			if (user == null) {
 				return Response.status(Response.Status.NOT_FOUND).entity("Usuario no encontrado").build();
 			}
+
+			user.setId(id);
 			user.setGender(newUser.getGender());
 			user.setAge(newUser.getAge());
 			user.setEmail(newUser.getEmail());
 
-			ps = conn.prepareStatement(
-					"UPDATE `SocialReading`.`user` SET `name` = ?, `gender` = ?, `age` = ?, `email` = ? WHERE `id` = ?");
-			ps.setString(1, user.getName());
-			ps.setString(2, user.getGender());
-			ps.setInt(3, user.getAge());
-			ps.setString(4, user.getEmail());
-			ps.setInt(5, id);
-			ps.executeUpdate();
+			userDAO.updateUser(conn, user);
 
 			return Response.status(Response.Status.OK).header("Content-Location", uriInfo.getAbsolutePath()).build();
 		} catch (SQLException e) {
@@ -140,13 +120,11 @@ public class UsersResource {
 	@Path("{id_user}")
 	public Response deleteUser(@PathParam("id_user") int id) {
 		try {
-			PreparedStatement ps = conn.prepareStatement("DELETE FROM user WHERE id = ?;");
-			ps.setInt(1, id);
-			int affectedRows = ps.executeUpdate();
-			if (affectedRows == 1)
+			if (userDAO.deleteUser(conn, id)) {
 				return Response.status(Response.Status.NO_CONTENT).build();
-			else
+			} else {
 				return Response.status(Response.Status.NOT_FOUND).entity("Usuario no encontrado").build();
+			}
 		} catch (SQLException e) {
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
 					.entity("No se pudo eliminar el usuario\n" + e.getStackTrace()).build();
@@ -157,14 +135,9 @@ public class UsersResource {
 	@Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
 	public Response getUsers(@QueryParam("name") @DefaultValue("") String name) {
 		try {
-			PreparedStatement ps = conn.prepareStatement("SELECT id FROM user WHERE name LIKE '%" + name + "%'");
-			ResultSet rs = ps.executeQuery();
-			Users users = new Users();
-			ArrayList<Link> listUsers = users.getUsers();
-			while (rs.next()) {
-				listUsers.add(new Link(rs.getInt("id"), uriInfo.getAbsolutePath() + "/" + rs.getInt("id"), "self"));
-			}
-			return Response.status(Response.Status.OK).entity(users).header("Content-Location", uriInfo.getAbsolutePath()).build();
+			Users users = userDAO.getUsers(conn, uriInfo, name);
+			return Response.status(Response.Status.OK).entity(users)
+					.header("Content-Location", uriInfo.getAbsolutePath() + "?name=" + name).build();
 		} catch (SQLException e) {
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Error de acceso a BBDD").build();
 		}

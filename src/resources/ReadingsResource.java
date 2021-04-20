@@ -30,8 +30,11 @@ import javax.ws.rs.core.UriInfo;
 
 import org.apache.naming.NamingContext;
 
+import dao.BookDAO;
+import dao.ReadingDAO;
 import model.Book;
 import model.Readings;
+import model.User;
 import model.Link;
 import model.Reading;
 
@@ -42,9 +45,11 @@ public class ReadingsResource {
 
 	private DataSource ds;
 	private Connection conn;
+	private final BookDAO bookDAO;
+	private final ReadingDAO readingDAO;
 
 	private int userId;
-	private final SimpleDateFormat format = new SimpleDateFormat("MM-dd-yyyy");
+	private final SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy");
 
 	public ReadingsResource(@PathParam("id_user") int userId) {
 		this.userId = userId;
@@ -60,6 +65,8 @@ public class ReadingsResource {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+		bookDAO = BookDAO.getInstance();
+		readingDAO = ReadingDAO.getInstance();
 	}
 
 	@POST
@@ -67,38 +74,16 @@ public class ReadingsResource {
 	public Response createReading(Reading reading) {
 		try {
 			Book book = reading.getBook();
-			PreparedStatement ps = conn.prepareStatement("SELECT * FROM book WHERE isbn = ?");
-			ps.setString(1, book.getIsbn());
-			ResultSet rs = ps.executeQuery();
-			if (rs.next()) {
-				book = new Book(rs.getString("title"), rs.getString("author"), rs.getString("category"),
-						rs.getString("isbn"));
-				book.setId(rs.getInt("id"));
-				reading.setBook(book);
-			} else {
-				ps = conn.prepareStatement(
-						"INSERT INTO `SocialReading`.`book` (`title`,`author`,`category`,`isbn`) VALUES(?, ?, ?, ?)",
-						Statement.RETURN_GENERATED_KEYS);
-				ps.setString(1, book.getTitle());
-				ps.setString(2, book.getAuthor());
-				ps.setString(3, book.getCategory());
-				ps.setString(4, book.getIsbn());
-				ps.executeUpdate();
-				ResultSet generatedID = ps.getGeneratedKeys();
-				if (generatedID.next()) {
-					book.setId(generatedID.getInt(1));
-				} else {
-					return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("No se pudo crear el libro ")
+			book = bookDAO.getBook(conn, book.getIsbn());
+			if (book == null) {
+				book = bookDAO.addBook(conn, reading.getBook());
+				if (book == null) {
+					return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("No se pudo crear el libro")
 							.build();
 				}
 			}
-			ps = conn.prepareStatement(
-					"INSERT INTO `SocialReading`.`reading` (`id_user`,`id_book`,`date`,`qualification`) VALUES(?, ?, ?, ?)");
-			ps.setInt(1, this.userId);
-			ps.setInt(2, book.getId());
-			ps.setDate(3, new java.sql.Date(format.parse(reading.getDate()).getTime()));
-			ps.setInt(4, reading.getQualification());
-			ps.executeUpdate();
+			reading.setBook(book);
+			readingDAO.addReading(conn, format, this.userId, reading);
 			return Response.status(Response.Status.CREATED)
 					.header("Location", uriInfo.getAbsolutePath() + "/" + book.getId()).build();
 		} catch (ParseException e) {
@@ -109,18 +94,31 @@ public class ReadingsResource {
 		}
 	}
 
+	@GET
+	@Path("{id_book}")
+	@Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
+	public Response getReading(@PathParam("id_book") int bookId) {
+		try {
+			Reading reading = readingDAO.getReading(conn, format, this.userId, bookId);
+			if (reading == null) {
+				return Response.status(Response.Status.NOT_FOUND).entity("Lectura no encontrada").build();
+			}
+			return Response.status(Response.Status.OK).entity(reading)
+					.header("Content-Location", uriInfo.getAbsolutePath()).build();
+		} catch (SQLException e) {
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Error de acceso a BBDD").build();
+		}
+	}
+
 	@DELETE
 	@Path("{id_book}")
 	public Response deleteReading(@PathParam("id_book") int bookId) {
 		try {
-			PreparedStatement ps = conn.prepareStatement("DELETE FROM reading WHERE id_user = ? AND id_book = ?");
-			ps.setInt(1, this.userId);
-			ps.setInt(2, bookId);
-			int affectedRows = ps.executeUpdate();
-			if (affectedRows == 1)
+			if (readingDAO.deleteReading(conn, this.userId, bookId)) {
 				return Response.status(Response.Status.NO_CONTENT).build();
-			else
+			} else {
 				return Response.status(Response.Status.NOT_FOUND).entity("Lectura no encontrado").build();
+			}
 		} catch (SQLException e) {
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
 					.entity("No se pudo eliminar la lectura\n" + e.getStackTrace()).build();
@@ -133,38 +131,22 @@ public class ReadingsResource {
 	public Response updateReading(@PathParam("id_book") int bookId, Reading newReading) {
 		try {
 			Reading reading = new Reading();
-			PreparedStatement ps = conn.prepareStatement("SELECT * FROM reading WHERE id_user = ? AND id_book = ?");
-			ps.setInt(1, this.userId);
-			ps.setInt(2, bookId);
-			ResultSet rs = ps.executeQuery();
-			if (rs.next()) {
-				Book book = newReading.getBook();
-				ps = conn.prepareStatement("SELECT * FROM book WHERE isbn = ?");
-				ps.setString(1, book.getIsbn());
-				rs = ps.executeQuery();
-				if (rs.next()) {
-					book = new Book(rs.getString("title"), rs.getString("author"), rs.getString("category"),
-							rs.getString("isbn"));
-					book.setId(rs.getInt("id"));
+			if (readingDAO.existReading(conn, this.userId, bookId)) {
+				Book book = bookDAO.getBook(conn, newReading.getBook().getIsbn());
+				if (book != null) {
 					newReading.setBook(book);
 				} else {
 					return Response.status(Response.Status.NOT_FOUND).entity("Libro no encontrado").build();
 				}
 			} else {
-				return Response.status(Response.Status.NOT_FOUND).entity("Lectura no encontrado").build();
+				return Response.status(Response.Status.NOT_FOUND).entity("Lectura no encontrada").build();
 			}
+
 			reading.setBook(newReading.getBook());
 			reading.setDate(newReading.getDate());
 			reading.setQualification(newReading.getQualification());
 
-			ps = conn.prepareStatement(
-					"UPDATE reading SET id_book = ?, date = ?, qualification = ? WHERE id_user = ? AND id_book = ?");
-			ps.setInt(1, reading.getBook().getId());
-			ps.setDate(2, new java.sql.Date(format.parse(reading.getDate()).getTime()));
-			ps.setInt(3, reading.getQualification());
-			ps.setInt(4, this.userId);
-			ps.setInt(5, bookId);
-			ps.executeUpdate();
+			readingDAO.updateReading(conn, format, this.userId, bookId, reading);
 
 			return Response.status(Response.Status.OK)
 					.header("Content-Location", uriInfo.getAbsolutePath() + "/" + reading.getBook().getId()).build();
@@ -172,7 +154,7 @@ public class ReadingsResource {
 			return Response.status(Response.Status.BAD_REQUEST).entity("Fecha con formato incorrecto").build();
 		} catch (SQLException e) {
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-					.entity("No se pudo actualizar la lecturan" + e.getStackTrace()).build();
+					.entity("No se pudo actualizar la lectura\n" + e.getStackTrace()).build();
 		}
 	}
 
@@ -187,22 +169,16 @@ public class ReadingsResource {
 			} else {
 				castDate = format.parse(date);
 			}
-			PreparedStatement ps = conn.prepareStatement(
-					"SELECT id_book FROM reading WHERE date < ? AND id_user = ? ORDER BY date DESC LIMIT ? OFFSET ?");
-			ps.setDate(1, new java.sql.Date(castDate.getTime()));
-			ps.setInt(2, this.userId);
-			ps.setInt(3, limit);
-			ps.setInt(4, offset);
-			ResultSet rs = ps.executeQuery();
+			Readings readings = readingDAO.getReadings(conn, uriInfo, format, this.userId, castDate, limit, offset);
 			int nextOffset = limit + offset;
-			Readings readings = new Readings(uriInfo.getAbsolutePath() + "?date=" + format.format(castDate) + "&limit="
-					+ limit + "&offset=" + nextOffset);
-			ArrayList<Link> listBooks = readings.getReadings();
-			while (rs.next()) {
-				listBooks.add(
-						new Link(rs.getInt("id_book"), uriInfo.getAbsolutePath() + "/" + rs.getInt("id_book"), "self"));
+			readings.setNext(uriInfo.getAbsolutePath() + "?date=" + date + "&limit=" + limit + "&offset=" + nextOffset);
+			int prevOffset = offset - limit;
+			if (prevOffset >= 0) {
+				readings.setPrev(
+						uriInfo.getAbsolutePath() + "?date=" + date + "&limit=" + limit + "&offset=" + prevOffset);
 			}
-			return Response.status(Response.Status.OK).entity(readings).header("Content-Location", uriInfo.getAbsolutePath()).build();
+			return Response.status(Response.Status.OK).entity(readings)
+					.header("Content-Location", uriInfo.getAbsolutePath()).build();
 		} catch (ParseException e) {
 			return Response.status(Response.Status.BAD_REQUEST).entity("Fecha con formato incorrecto").build();
 		} catch (SQLException e) {

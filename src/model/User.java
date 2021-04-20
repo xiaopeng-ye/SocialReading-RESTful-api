@@ -2,8 +2,10 @@ package model;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlType;
 
 @XmlRootElement(name = "user")
+@XmlType(propOrder = { "name", "gender", "age", "email" })
 public class User {
 	private int id;
 	private String name;
