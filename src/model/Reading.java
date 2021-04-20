@@ -2,8 +2,10 @@ package model;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlType;
 
 @XmlRootElement(name = "reading")
+@XmlType(propOrder = { "book", "date", "qualification" })
 public class Reading {
 	private Book book;
 	private String date;

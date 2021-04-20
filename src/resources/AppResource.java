@@ -22,6 +22,9 @@ import javax.ws.rs.core.UriInfo;
 
 import org.apache.naming.NamingContext;
 
+import dao.FriendDAO;
+import dao.ReadingDAO;
+import dao.UserDAO;
 import model.App;
 import model.Book;
 import model.Link;
@@ -35,9 +38,12 @@ public class AppResource {
 
 	private DataSource ds;
 	private Connection conn;
+	private final UserDAO userDAO;
+	private final FriendDAO friendDAO;
+	private final ReadingDAO readingDAO;
 
 	private int userId;
-	private final SimpleDateFormat format = new SimpleDateFormat("MM-dd-yyyy");
+	private final SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy");
 
 	public AppResource(@PathParam("id_user") int userId) {
 		this.userId = userId;
@@ -53,72 +59,34 @@ public class AppResource {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+		userDAO = UserDAO.getInstance();
+		friendDAO = FriendDAO.getInstance();
+		readingDAO = ReadingDAO.getInstance();
 	}
 
 	@GET
 	@Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
 	public Response getAppInfo() {
 		try {
-			User user;
-			PreparedStatement ps = conn.prepareStatement("SELECT * FROM user WHERE id = ?");
-			ps.setInt(1, this.userId);
-			ResultSet rs = ps.executeQuery();
-			if (rs.next()) {
-				user = new User(rs.getString("name"), rs.getString("gender"), rs.getInt("age"), rs.getString("email"));
-				user.setId(this.userId);
-			} else {
+			User user = userDAO.getUser(conn, this.userId);
+			if (user == null) {
 				return Response.status(Response.Status.NOT_FOUND).entity("Usuario no encontrado").build();
 			}
 
-			int numFriends = 0;
-			ps = conn.prepareStatement(
-					"SELECT COUNT(id_user_b) FROM is_friend_of WHERE id_user_a = ? GROUP BY id_user_a");
-			ps.setInt(1, this.userId);
-			rs = ps.executeQuery();
-			if (rs.next()) {
-				numFriends = rs.getInt(1);
-			}
+			int numFriends = friendDAO.getFriendsNum(conn, this.userId);
 
-			Book book = null;
-			Reading reading = new Reading();
-			ps = conn.prepareStatement("SELECT id_book, qualification, date FROM reading WHERE id_user = ?");
-			ps.setInt(1, this.userId);
-			rs = ps.executeQuery();
+			Reading reading = readingDAO.getLastReading(conn, format, this.userId);
 
-			ps = conn.prepareStatement("SELECT * FROM book WHERE id = ?");
-			if (rs.next()) {
-				ps.setInt(1, rs.getInt(1));
-				reading.setQualification((byte) rs.getInt(2));
-				reading.setDate(this.format.format(new Date(rs.getDate(3).getTime())));
-			}
-			rs = ps.executeQuery();
-			if (rs.next()) {
-				book = new Book(rs.getString("title"), rs.getString("author"), rs.getString("category"),
-						rs.getString("isbn"));
-				book.setId(rs.getInt("id"));
-				reading.setBook(book);
-			}
-			
 			App app = new App(user, reading, numFriends);
-			ArrayList<Link> listReadings = app.getlastFriendsReadings();
-			
-			ps = conn.prepareStatement(
-					"SELECT r.id_user FROM reading r, is_friend_of i WHERE i.id_user_b = r.id_user AND i.id_user_a = ? GROUP BY r.id_user ORDER BY MAX(r.date) DESC");
-			ps.setInt(1, this.userId);
-			rs = ps.executeQuery();
-			ps = conn.prepareStatement("SELECT id_book FROM reading WHERE id_user = ? ORDER BY date DESC LIMIT 1");
-			while (rs.next()) {
-				ps.setInt(1, rs.getInt("id_user"));
-				ResultSet rs1 = ps.executeQuery();
-				if (rs1.next()) {
-					listReadings.add(new Link(rs.getInt("id_user"), uriInfo.getBaseUri() + "users/"
-							+ rs.getInt("id_user") + "/readings/" + rs1.getInt("id_book"), "self"));
-				}
 
-			}
-			return Response.status(Response.Status.OK).entity(app).header("Content-Location", uriInfo.getAbsolutePath()).build();
+			ArrayList<Link> listReadings = app.getLastFriendsReadings();
+			readingDAO.getLastFriendsReadings(conn, uriInfo, listReadings, this.userId);
+
+			return Response.status(Response.Status.OK).entity(app).header("Content-Location", uriInfo.getAbsolutePath())
+					.build();
 		} catch (SQLException e) {
-			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Error de acceso a BBDD" + e.getMessage()).build();
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+					.entity("Error de acceso a BBDD" + e.getMessage()).build();
 		}
 	}
 

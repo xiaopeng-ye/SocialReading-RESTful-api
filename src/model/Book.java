@@ -2,8 +2,10 @@ package model;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlType;
 
 @XmlRootElement(name = "book")
+@XmlType(propOrder = { "title", "author", "category", "isbn" })
 public class Book {
 	private int id;
 	private String title;
