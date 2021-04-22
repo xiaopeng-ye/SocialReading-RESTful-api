@@ -150,5 +150,19 @@ public class FriendsResource {
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Error de acceso a BBDD").build();
 		}
 	}
+	
+	@GET
+	@Path("recommended_books")
+	@Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
+	public Response getRecommendedBook(@QueryParam("qualification") @DefaultValue("0") int qualification,
+			@QueryParam("category") @DefaultValue("") String category) {
+		try {
+			Readings readings = readingDAO.getRecommendedReadings(conn, uriInfo, this.userId, qualification, category);
+			return Response.status(Response.Status.OK).entity(readings)
+					.header("Content-Location", uriInfo.getAbsolutePath()).build();
+		} catch (SQLException e) {
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Error de acceso a BBDD").build();
+		}
+	}
 
 }

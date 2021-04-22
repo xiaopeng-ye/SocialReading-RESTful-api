@@ -23,9 +23,7 @@ import javax.ws.rs.core.UriInfo;
 
 import org.apache.naming.NamingContext;
 
-import dao.ReadingDAO;
 import dao.UserDAO;
-import model.Readings;
 import model.User;
 import model.Users;
 
@@ -37,7 +35,6 @@ public class UsersResource {
 	private DataSource ds;
 	private Connection conn;
 	private final UserDAO userDAO;
-	private final ReadingDAO readingDAO;
 
 	public UsersResource() {
 		InitialContext ctx;
@@ -53,7 +50,6 @@ public class UsersResource {
 			e.printStackTrace();
 		}
 		userDAO = UserDAO.getInstance();
-		readingDAO = ReadingDAO.getInstance();
 	}
 
 	@POST
@@ -135,20 +131,6 @@ public class UsersResource {
 			Users users = userDAO.getUsers(conn, uriInfo, name);
 			return Response.status(Response.Status.OK).entity(users)
 					.header("Content-Location", uriInfo.getAbsolutePath() + "?name=" + name).build();
-		} catch (SQLException e) {
-			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Error de acceso a BBDD").build();
-		}
-	}
-	
-	@GET
-	@Path("{id_user}/recommended_books")
-	@Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
-	public Response getRecommendedBook(@PathParam("id_user") int id, @QueryParam("qualification") @DefaultValue("0") int qualification,
-			@QueryParam("category") @DefaultValue("") String category) {
-		try {
-			Readings readings = readingDAO.getRecommendedReadings(conn, uriInfo, id, qualification, category);
-			return Response.status(Response.Status.OK).entity(readings)
-					.header("Content-Location", uriInfo.getAbsolutePath()).build();
 		} catch (SQLException e) {
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Error de acceso a BBDD").build();
 		}
