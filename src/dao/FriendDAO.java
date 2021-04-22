@@ -4,15 +4,12 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 
-import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
 import model.Friends;
 import model.Link;
-import model.User;
 
 public class FriendDAO {
 	private static FriendDAO singleton = null;

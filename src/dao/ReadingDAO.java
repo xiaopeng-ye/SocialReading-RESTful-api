@@ -9,10 +9,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
-import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
-import model.Book;
 import model.Link;
 import model.Reading;
 import model.Readings;

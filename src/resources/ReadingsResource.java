@@ -1,13 +1,9 @@
 package resources;
 
 import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 
 import javax.naming.InitialContext;
@@ -34,8 +30,6 @@ import dao.BookDAO;
 import dao.ReadingDAO;
 import model.Book;
 import model.Readings;
-import model.User;
-import model.Link;
 import model.Reading;
 
 @Path("/users/{id_user}/readings")

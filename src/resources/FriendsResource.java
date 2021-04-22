@@ -1,12 +1,9 @@
 package resources;
 
 import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 
 import javax.naming.InitialContext;
@@ -33,7 +30,6 @@ import dao.ReadingDAO;
 import dao.UserDAO;
 import model.Readings;
 import model.Friends;
-import model.Link;
 import model.User;
 
 @Path("/users/{id_user}/friends")
@@ -150,20 +146,6 @@ public class FriendsResource {
 					.header("Content-Location", uriInfo.getAbsolutePath()).build();
 		} catch (ParseException e) {
 			return Response.status(Response.Status.BAD_REQUEST).entity("Fecha con formato incorrecto").build();
-		} catch (SQLException e) {
-			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Error de acceso a BBDD").build();
-		}
-	}
-
-	@GET
-	@Path("recommended_books")
-	@Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
-	public Response getRecommendedBook(@QueryParam("qualification") @DefaultValue("0") int qualification,
-			@QueryParam("category") @DefaultValue("") String category) {
-		try {
-			Readings readings = readingDAO.getRecommendedReadings(conn, uriInfo, this.userId, qualification, category);
-			return Response.status(Response.Status.OK).entity(readings)
-					.header("Content-Location", uriInfo.getAbsolutePath()).build();
 		} catch (SQLException e) {
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Error de acceso a BBDD").build();
 		}

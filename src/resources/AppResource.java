@@ -1,12 +1,9 @@
 package resources;
 
 import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
@@ -26,7 +23,6 @@ import dao.FriendDAO;
 import dao.ReadingDAO;
 import dao.UserDAO;
 import model.App;
-import model.Book;
 import model.Link;
 import model.Reading;
 import model.User;
