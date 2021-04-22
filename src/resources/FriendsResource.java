@@ -25,10 +25,12 @@ import javax.ws.rs.core.UriInfo;
 
 import org.apache.naming.NamingContext;
 
+import dao.BookDAO;
 import dao.FriendDAO;
 import dao.ReadingDAO;
 import dao.UserDAO;
 import model.Readings;
+import model.Books;
 import model.Friends;
 import model.User;
 
@@ -42,6 +44,7 @@ public class FriendsResource {
 	private final FriendDAO friendDAO;
 	private final UserDAO userDAO;
 	private final ReadingDAO readingDAO;
+	private final BookDAO bookDAO;
 
 	private int userId;
 	private final SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy");
@@ -63,6 +66,7 @@ public class FriendsResource {
 		friendDAO = FriendDAO.getInstance();
 		userDAO = UserDAO.getInstance();
 		readingDAO = ReadingDAO.getInstance();
+		bookDAO = BookDAO.getInstance();
 	}
 
 	@POST
@@ -82,6 +86,7 @@ public class FriendsResource {
 					.entity("No se pudo añadir como amigo\n" + e.getStackTrace()).build();
 		}
 	}
+	
 
 	@DELETE
 	@Path("{id_friend}")
@@ -157,8 +162,8 @@ public class FriendsResource {
 	public Response getRecommendedBook(@QueryParam("qualification") @DefaultValue("0") int qualification,
 			@QueryParam("category") @DefaultValue("") String category) {
 		try {
-			Readings readings = readingDAO.getRecommendedReadings(conn, uriInfo, this.userId, qualification, category);
-			return Response.status(Response.Status.OK).entity(readings)
+			Books books = bookDAO.getRecommendedBooks(conn, uriInfo, this.userId, qualification, category);
+			return Response.status(Response.Status.OK).entity(books)
 					.header("Content-Location", uriInfo.getAbsolutePath()).build();
 		} catch (SQLException e) {
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Error de acceso a BBDD").build();

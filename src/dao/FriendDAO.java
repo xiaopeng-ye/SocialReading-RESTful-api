@@ -57,7 +57,7 @@ public class FriendDAO {
 		ps.setInt(3, offset);
 		ResultSet rs = ps.executeQuery();
 		Friends friends = new Friends();
-		ArrayList<Link> listFriends = friends.getUsers();
+		ArrayList<Link> listFriends = friends.getFriends();
 		while (rs.next()) {
 			listFriends.add(new Link(rs.getInt(1), uriInfo.getBaseUri() + "users" + "/" + rs.getInt(1), "self"));
 		}

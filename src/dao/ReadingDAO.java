@@ -157,23 +157,6 @@ public class ReadingDAO {
 		return readings;
 	}
 
-	public Readings getRecommendedReadings(Connection conn, UriInfo uriInfo, int userId, int qualification,
-			String category) throws SQLException {
-		PreparedStatement ps = conn.prepareStatement(
-				"SELECT l.id, le.id_user FROM book l, reading le WHERE l.id=le.id_book AND le.qualification > ? AND l.category LIKE '%"
-						+ category + "%' AND le.id_user IN ( SELECT id_user_b FROM is_friend_of WHERE id_user_a = ?)");
-		ps.setInt(1, qualification);
-		ps.setInt(2, userId);
-		ResultSet rs = ps.executeQuery();
-		Readings readings = new Readings();
-		ArrayList<Link> listReadings = readings.getReadings();
-		while (rs.next()) {
-			listReadings.add(new Link(rs.getInt("id_user"),
-					uriInfo.getBaseUri() + "users/" + rs.getInt("id_user") + "/readings/" + rs.getInt("id"), "self"));
-		}
-		return readings;
-	}
-
 	public void getLastFriendsReadings(Connection conn, UriInfo uriInfo, ArrayList<Link> listReadings, int userId)
 			throws SQLException {
 		PreparedStatement ps = conn.prepareStatement(

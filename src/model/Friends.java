@@ -45,11 +45,11 @@ public class Friends {
 	}
 
 	@XmlElement(name = "user")
-	public ArrayList<Link> getUsers() {
+	public ArrayList<Link> getFriends() {
 		return friends;
 	}
 
-	public void setUsers(ArrayList<Link> users) {
+	public void setFriends(ArrayList<Link> users) {
 		this.friends = users;
 	}
 

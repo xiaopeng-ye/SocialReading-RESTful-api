@@ -49,7 +49,7 @@ public class Readings {
 		return readings;
 	}
 
-	public void setBooks(ArrayList<Link> books) {
+	public void setReadings(ArrayList<Link> books) {
 		this.readings = books;
 	}
 }
