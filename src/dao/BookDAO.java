@@ -5,13 +5,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
-
-import javax.ws.rs.core.UriInfo;
 
 import model.Book;
-import model.Books;
-import model.Link;
 
 public class BookDAO {
 	private static BookDAO singleton = null;
@@ -70,19 +65,4 @@ public class BookDAO {
 		return null;
 	}
 	
-	public Books getRecommendedBooks(Connection conn, UriInfo uriInfo, int userId, int qualification,
-			String category) throws SQLException {
-		PreparedStatement ps = conn.prepareStatement(
-				"SELECT l.id FROM book l, reading le WHERE l.id=le.id_book AND le.qualification > ? AND l.category LIKE '%"
-						+ category + "%' AND le.id_user IN ( SELECT id_user_b FROM is_friend_of WHERE id_user_a = ?) GROUP BY l.id");
-		ps.setInt(1, qualification);
-		ps.setInt(2, userId);
-		ResultSet rs = ps.executeQuery();
-		Books books = new Books();
-		ArrayList<Link> listReadings = books.getBooks();
-		while (rs.next()) {
-			listReadings.add(new Link(rs.getInt("id"), uriInfo.getBaseUri() + "books/" + rs.getInt("id"), "self"));
-		}
-		return books;
-	}
 }
