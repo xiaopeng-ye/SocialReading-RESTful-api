@@ -143,7 +143,7 @@ public class ReadingsResource {
 			readingDAO.updateReading(conn, format, this.userId, bookId, reading);
 
 			return Response.status(Response.Status.OK)
-					.header("Content-Location", uriInfo.getAbsolutePath() + "/" + reading.getBook().getId()).build();
+					.header("Content-Location", uriInfo.getBaseUri() + "users/" + this.userId + "/readings/" + reading.getBook().getId()).build();
 		} catch (ParseException e) {
 			return Response.status(Response.Status.BAD_REQUEST).entity("Fecha con formato incorrecto").build();
 		} catch (SQLException e) {
